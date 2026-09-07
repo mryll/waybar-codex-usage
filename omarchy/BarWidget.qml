@@ -120,9 +120,10 @@ BarWidget {
     fixedWidth: root.vertical ? -1 : contentRow.implicitWidth + button.scaledHorizontalMargin * 2
     foreground: root.panelItem ? root.panelItem.barColor
                                : (root.bar ? root.bar.barForeground : Color.foreground)
-    // Normally suppressed — the panel is the detail view. The one exception is
-    // the alarm dot: a mark you can't interpret is worse than no mark, so
-    // hovering names the window that is actually spent.
+    // Normally suppressed — the panel is the detail view. Two exceptions: the
+    // alarm dot — a mark you can't interpret is worse than no mark, so
+    // hovering names the window that is actually spent — and the stale mark,
+    // which says how old the data on the bar is.
     tooltipText: root.panelItem ? root.panelItem.barTooltip : ""
 
     onPressed: function(b) {

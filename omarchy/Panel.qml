@@ -264,15 +264,6 @@ Panel {
     return s[s.length - 1].color
   }
 
-  // Text handed to the shell's shared tooltip is rendered as rich text outside
-  // this plugin's control, and window labels can carry API-supplied model
-  // names, so escape first and then wrap: the <span> forces AutoText into
-  // rich-text mode, which is what makes the escaped entities decode correctly.
-  function safeTooltip(s) {
-    return "<span>" + String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;")
-        .replace(/>/g, "&gt;").replace(/\n/g, "<br/>") + "</span>"
-  }
-
   // For shell components whose Text this plugin cannot set textFormat on —
   // PanelHero's meta line is one — an API string could arrive looking like
   // markup and be picked up by AutoText. Stripping the characters that make
@@ -451,13 +442,20 @@ Panel {
     return lines.join("\n")
   }
 
-  // Empty when there is no dot — Bar.showTooltip short-circuits on empty text,
+  // Empty when there is no mark — Bar.showTooltip short-circuits on empty text,
   // so the bar face stays tooltip-free and the panel remains the detail view.
+  //
+  // Plain text, handed over raw: the shell's tooltip label is a PlainText Text
+  // (Bar.qml, tooltipLabel — declared upstream since omarchy 3af7675), so
+  // markup is printed verbatim. Escaping the string and wrapping it in a
+  // <span> put a literal "<span>Session: 96%</span>" on the bar. No escaping
+  // and no stripping here: the API-supplied limit names keep their <>&, and
+  // PlainText cannot interpret them as markup.
   readonly property string barTooltip: {
     var parts = []
     if (hasCriticalOther) parts.push(criticalOthersText)
-    if (barStale) parts.push(" Stale — showing the last data from " + (updatedTimeText() || "earlier"))
-    return parts.length > 0 ? safeTooltip(parts.join("\n")) : ""
+    if (barStale) parts.push("Stale — showing the last data from " + (updatedTimeText() || "earlier"))
+    return parts.join("\n")
   }
 
   // The dot is a warning, so it takes the gauge's critical anchor (under the
